@@ -1,0 +1,36 @@
+# Ignore virtual environments
+.venv/
+venv/
+
+# Ignore Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignore environment files (API keys, secrets)
+.env
+
+# Ignore operating system metadata
+.DS_Store
+
+# Ignore downloaded PDFs (e.g., allergen.pdf)
+*.pdf
+
+# Ignore log files
+*.log
+
+# Ignore database files (in case any local DBs are added)
+*.db
+*.sqlite
+
+# Ignore IDE/editor project settings
+.vscode/
+.idea/
+
+# Ignore testing coverage or pip wheel build artifacts
+htmlcov/
+*.egg-info/
+dist/
+build/
+.streamlit/secrets.toml
+.streamlit/secrets.toml

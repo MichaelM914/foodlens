@@ -1,0 +1,32 @@
+/* Background and layout */
+body {
+    background: linear-gradient(to bottom right, #f9f9f9, #e3e8ee);
+    font-family: 'Segoe UI', sans-serif;
+    color: #222;
+}
+
+/* Typography */
+h1, h2, h3 {
+    color: #222;
+    margin-bottom: 0.5em;
+}
+
+/* Main container card */
+section.main > div {
+    padding: 2rem;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar background (if used) */
+div[data-testid="stSidebar"] {
+    background-color: #f2f4f8;
+}
+
+/* Center logo image */
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

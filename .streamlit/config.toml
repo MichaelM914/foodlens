@@ -1,0 +1,16 @@
+# .streamlit/config.toml
+
+[server]
+headless = true
+
+[runner]
+enforceSerializableSessionState = false
+
+[theme]
+base = "light"
+
+[global]
+developmentMode = false
+
+[env]
+PYTHONPATH = "."
