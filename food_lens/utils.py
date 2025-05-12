@@ -12,6 +12,7 @@ SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
 SERPAPI_URL = "https://serpapi.com/search"
 KEYWORDS = ["allergen", "nutrition", "menu", "pdf"]
 
+
 print(f"[DEBUG] SerpAPI key loaded: {SERPAPI_API_KEY[:6]}...")  # Don't print full key
 
 
@@ -36,10 +37,15 @@ def download_file(url: str, filename: str) -> str:
     response = requests.get(url)
     if response.status_code != 200:
         raise RuntimeError(f"Failed to download file: {url}")
+
+    # Check if file starts with '%PDF' (magic number for PDF files)
+    if not response.content.startswith(b"%PDF"):
+        raise RuntimeError("Downloaded file is not a valid PDF — server may be returning an HTML page")
+
     with open(filename, "wb") as f:
         f.write(response.content)
-    return filename
 
+    return filename
 
 # --- Search allergen page via SerpAPI ---
 def search_allergen_page(restaurant_name: str, max_results: int = 10) -> dict:
@@ -65,18 +71,33 @@ def search_allergen_page(restaurant_name: str, max_results: int = 10) -> dict:
     for result in results:
         link = result.get("link", "")
         title = result.get("title", "")
+        if not link:
+            continue
 
-        if is_pdf_url(link):
-            pdf_url = link
-            break  # Prefer PDFs
-        elif any(k in link.lower() or k in title.lower() for k in KEYWORDS):
-            html_url = link if not html_url else html_url  # Keep first good HTML fallback
+        try:
+            head = requests.head(link, allow_redirects=True, timeout=5)
+            content_type = head.headers.get("Content-Type", "").lower()
+
+            if is_pdf_url(link) and "pdf" in content_type:
+                print(f"[DEBUG] ✅ Valid PDF found: {link}")
+                pdf_url = link
+                break  # Prefer first valid PDF
+            elif not html_url and "html" in content_type:
+                # Test HTML body to avoid maintenance pages
+                preview = requests.get(link, timeout=5).text[:500].lower()
+                if "we're working on it" not in preview and "unavailable" not in preview:
+                    print(f"[DEBUG] ⚠️ Valid HTML fallback found: {link}")
+                    html_url = link
+        except Exception as e:
+            print(f"[DEBUG] ❌ Skipping broken link: {link} ({e})")
 
     return {
         "restaurant": restaurant_name,
         "pdf_url": pdf_url,
         "html_url": html_url,
     }
+
+
 
 # Text preprocessing helpers
 
